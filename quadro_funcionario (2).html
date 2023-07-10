@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        var banco = [];
+        var indice = -1;
+
+        banco.push({nome: 'Luis', 
+                    email: "luis@teste.com", 
+                    dataAdmissao: '2023-01-01',
+                    salario: 3000,
+                    dataNascimento: '2000-01-01'});
+
+        banco.push({nome: 'Renato', 
+                    email: "renato@teste.com", 
+                    dataAdmissao: '2023-01-01',
+                    salario: 3000,
+                    dataNascimento: '2000-01-01'});
+
+        banco.push({nome: 'Paula', 
+                    email: "paula@teste.com", 
+                    dataAdmissao: '2023-01-01',
+                    salario: 5000,
+                    dataNascimento: '2000-01-01'});
+                    
+        //listar();
+/*
+        var pessoa = {
+            nome: "",
+            email: "",
+            dataAdmissao: "",
+            salario: 0
+        };
+*/
+        function cadastrar(){
+            var pessoa = {};
+            pessoa["nome"] = document.getElementById("nome").value;
+            pessoa["email"] = document.getElementById("email").value;
+            pessoa["dataAdmissao"] = document.getElementById("dataAdmissao").value;
+            pessoa["salario"] = Number(document.getElementById("salario").value);
+  
+            pessoa["dataNascimento"] = document.getElementById("nascimento").value;
+
+            banco.push(pessoa);
+
+            alert(pessoa.nome + " foi cadastrado(a)");
+            listar();
+            limpar();
+        }
+
+        function limpar(){
+            var elementos = document.getElementsByTagName("input");
+        
+            for (var i=0; i < 5; i++){
+                elementos[i].value = "";    
+            }
+        }
+
+        function listar(){
+            var saida = cabecalhoTabela();
+
+            for(var i=0; i < banco.length; i++) {
+                saida += inserirLinha(banco[i], i);       
+                console.log(banco[i]);
+            }
+
+            document.getElementById("tabela").innerHTML = saida;
+        }
+
+        function colunaAcoes(posicao){
+            var coluna = "<td>";
+            coluna += "<input type='button' value='Editar'";
+            coluna += " onclick='editar(" + posicao + ")' />";
+            
+            coluna += "<input type='button' value='Excluir'";
+            coluna += " onclick='excluir(" + posicao + ")' />";
+
+            coluna += "</td>"; 
+            return coluna;   
+        }
+
+
+        function formatarData(adm){
+            var admissao = adm.split("-");
+
+            return admissao[2] + "/" + admissao[1] + "/" + admissao[0];
+        }
+
+        function formatarSalario(sal) {
+            var s = sal.toFixed(2);
+
+            return s.replace(".", ",");
+        }
+
+        function editar(p){
+            indice = p;
+            document.getElementById("nome").value = banco[p].nome;
+            document.getElementById("email").value = banco[p].email;
+            document.getElementById("dataAdmissao").value = banco[p].dataAdmissao;
+            document.getElementById("salario").value = banco[p].salario;
+            document.getElementById("nascimento").value = banco[p].dataNascimento;
+
+            document.getElementById("cadastro").disabled = true;
+            document.getElementById("atualiza").disabled = false;
+        }
+
+        function atualizar(){
+            banco[indice].nome = document.getElementById("nome").value;
+            banco[indice].email = document.getElementById("email").value;
+            banco[indice].dataAdmissao = document.getElementById("dataAdmissao").value;
+            banco[indice].salario = Number(document.getElementById("salario").value);
+            banco[indice].dataNascimento = document.getElementById("nascimento").value;
+            
+            listar();
+            limpar();
+
+            document.getElementById("cadastro").disabled = false;
+            document.getElementById("atualiza").disabled = true;
+        }
+
+        function excluir(p){
+            var resposta = confirm("Deseja excluir este funcionário?");
+            if (resposta == true){
+                banco.splice(p, 1);
+                listar();
+            }
+        }
+
+        function buscar(){
+            var nome = document.getElementById("nomeBusca").value;
+
+            var saida =  cabecalhoTabela();
+
+            for(var i=0; i<banco.length; i++){
+                //Primeira versão
+                //if(banco[i].nome.toLowerCase() == nome.toLowerCase()){
+                //Segunda versão
+                if(banco[i].nome.toLowerCase().indexOf(nome.toLowerCase()) != -1 ){    
+                    saida += inserirLinha(banco[i], i);       
+                }
+            }
+
+            document.getElementById("tabela").innerHTML = saida;
+        }
+
+        function cabecalhoTabela(){
+            var str = "<tr>";
+            str += "<td>Nome</td>";
+            str += "<td>E-mail</td>";
+            str += "<td>Data de Admissão</td>";
+            str += "<td>Salario</td>";
+            str += "<td>Data de Nascimento</td>";
+            str += "<td>Ações</td>";
+            str += "</tr>";
+            
+            return str;
+        }
+
+        function inserirLinha(objeto, p){
+           var str = "<tr>"
+                str += "<td>" + objeto.nome + "</td>"; 
+                str += "<td>" + objeto.email + "</td>";
+                str += "<td>" + formatarData(objeto.dataAdmissao) + "</td>";
+                str += "<td>" + formatarSalario(objeto.salario) + "</td>";
+                str += "<td>" + formatarData(objeto.dataNascimento) + "</td>";
+                str += colunaAcoes(p); 
+                str += "</tr>" 
+            return str;
+        }
+    </script>
+</head>
+<body onload="limpar(); listar() ">
+    <form>
+        <input type="text" id="nome" placeholder="Nome" />
+        <input type="email" id="email" placeholder="E-mail" />
+
+        <label>Data de Admissão: </label>       
+        <input type="date" id="dataAdmissao" 
+                placeholder="Data de admissão" />
+        <input type="number" id="salario" placeholder="salario" 
+               step=".01" />
+               
+        <label>Data de Nascimento: </label>       
+        <input type="date" id="nascimento" 
+                 />
+
+        <input type="button" value="Cadastrar" id="cadastro" 
+                onclick="cadastrar()"  />
+
+        <input type="button" value="Atualizar" id="atualiza" 
+                onclick="atualizar()" disabled="true" />
+
+
+    </form>
+    <form>
+        <input type="text" id="nomeBusca" 
+            placeholder="Informe nome para busca" />
+        
+        <input type="button" value="Buscar" 
+                onclick="buscar()" />
+    </form>
+
+    <table id="tabela" border="1">
+
+    </table>
+</body>
+</html>
